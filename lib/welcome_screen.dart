@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-final supabaseClientProvider = StateProvider<SupabaseClient>((ref) {
-  return Supabase.instance.client;
-});
-
-final todoProvider = FutureProvider<List>((ref) async {
-  final response = await ref.watch(supabaseClientProvider).from('my_todo').select();
-  return response as List;
-});
+import 'package:my_preloved/controller.dart';
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
@@ -20,6 +11,7 @@ class WelcomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: const Text('Selamat Datang'),
       ),
       body: RefreshIndicator(
@@ -36,28 +28,27 @@ class WelcomeScreen extends ConsumerWidget {
                 itemCount: dataTodo.length,
                 itemBuilder: (context, index) {
                   final todo = dataTodo[index];
+                  bool status = todo['status'];
+
                   return ListTile(
-                    title: Text(todo['nama'] as String),
-                    subtitle: Text(todo['deskripsi'] as String),
+                    leading: InkWell(
+                      onTap: () async {
+                        await ref.watch(supabaseClientProvider).from('my_todo').update({'status': !status}).match({'id': todo['id']});
+                        ref.invalidate(todoProvider);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: status ? Colors.green : Colors.purple,
+                        child: Icon(
+                          status ? Icons.check : Icons.close,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    title: Text(todo['nama'], style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
+                    subtitle: Text(todo['deskripsi'], style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
                     trailing: IconButton(
-                      onPressed: () async {
-                        final response = await ref.watch(supabaseClientProvider).from('my_todo').delete().match({'id': todo['id']}).execute();
-                        if (response.data != null) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(response.status.toString()),
-                            ),
-                          );
-                        } else {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Data berhasil dihapus'),
-                            ),
-                          );
-                          ref.invalidate(todoProvider);
-                        }
+                      onPressed: () {
+                        doDelete(context, ref, todo);
                       },
                       icon: const Icon(
                         Icons.delete,
@@ -143,5 +134,25 @@ class WelcomeScreen extends ConsumerWidget {
         content: Text('Data berhasil disimpan'),
       ),
     );
+  }
+
+  void doDelete(BuildContext context, WidgetRef ref, todo) async {
+    final response = await ref.watch(supabaseClientProvider).from('my_todo').delete().match({'id': todo['id']});
+    if (response.data != null) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.status.toString()),
+        ),
+      );
+    } else {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data berhasil dihapus'),
+        ),
+      );
+      ref.invalidate(todoProvider);
+    }
   }
 }
