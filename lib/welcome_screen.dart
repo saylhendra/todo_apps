@@ -13,13 +13,14 @@ class WelcomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Selamat Datang'),
+        title: const Text('Selamat Datang Di Live Code Saya'),
       ),
       body: RefreshIndicator(
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh: () async {
           doOpenForm(context, ref);
           ref.invalidate(todoProvider);
+          //looping array of string
         },
         child: todo.when(
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -28,7 +29,6 @@ class WelcomeScreen extends ConsumerWidget {
               var dataTodo = [...dataTodox];
               dataTodo.sort((a, b) => a['id'].compareTo(b['id']));
               return ListView.builder(
-                semanticChildCount: dataTodo.length,
                 itemCount: dataTodo.length,
                 itemBuilder: (context, index) {
                   var todo = dataTodo[index];
@@ -37,46 +37,53 @@ class WelcomeScreen extends ConsumerWidget {
                   return Animate(
                     effects: const [FadeEffect(), ShakeEffect()],
                     autoPlay: true,
-                    child: ListTile(
-                      leading: InkWell(
-                        onTap: () async {
-                          await ref.watch(supabaseClientProvider).from('my_todo').update({'status': !status}).match({'id': todo['id']});
-                          ref.invalidate(todoProvider);
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: status ? Colors.green : Colors.purple,
-                          child: Icon(
-                            status ? Icons.check : Icons.close,
-                            color: Colors.white,
+                    child: Card(
+                      color: Colors.amber,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: ListTile(
+                        leading: InkWell(
+                          onTap: () async {
+                            await ref.watch(supabaseClientProvider).from('my_todo').update({'status': !status}).match({'id': todo['id']});
+                            ref.invalidate(todoProvider);
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: status ? Colors.green : Colors.purple,
+                            child: Icon(
+                              status ? Icons.check : Icons.close,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                      ),
-                      title: Text(todo['nama'], style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
-                      subtitle: Text(todo['id'].toString(), style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
-                      trailing: IconButton(
-                        onPressed: () async {
-                          final response = await ref.watch(supabaseClientProvider).from('my_todo').delete().match({'id': todo['id']});
-                          Logger().i(response);
-                          if (response != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(response.status.toString()),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Data berhasil dihapus'),
-                              ),
-                            );
-                          }
-                          ref.invalidate(todoProvider);
-                        },
-                        icon: Animate(
-                          effects: const [ShakeEffect()],
-                          child: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
+                        title: Text(todo['nama'], style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
+                        subtitle:
+                            Text(todo['id'].toString(), style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
+                        trailing: IconButton(
+                          onPressed: () async {
+                            final response = await ref.watch(supabaseClientProvider).from('my_todo').delete().match({'id': todo['id']});
+                            Logger().i(response);
+                            if (response != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(response.status.toString()),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Data berhasil dihapus'),
+                                ),
+                              );
+                            }
+                            ref.invalidate(todoProvider);
+                          },
+                          icon: Animate(
+                            effects: const [ShakeEffect()],
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
                           ),
                         ),
                       ),
@@ -158,6 +165,7 @@ class WelcomeScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Data berhasil disimpan'),
+        backgroundColor: Colors.greenAccent,
       ),
     );
   }
