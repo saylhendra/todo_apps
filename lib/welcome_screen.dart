@@ -40,7 +40,7 @@ class WelcomeScreen extends ConsumerWidget {
                     child: Card(
                       color: Colors.amber,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(100.0),
                       ),
                       child: ListTile(
                         leading: InkWell(
