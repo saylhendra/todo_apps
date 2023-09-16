@@ -13,9 +13,9 @@ class MyApp extends StatelessWidget {
       title: 'SqAcademy',
       themeMode: ThemeMode.light,
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.purple,
-        ),
+        // appBarTheme: const AppBarTheme(
+        //   backgroundColor: Colors.purple,
+        // ),
         filledButtonTheme: FilledButtonThemeData(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(Colors.purple),
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        colorSchemeSeed: Colors.deepPurpleAccent,
+        // colorSchemeSeed: Colors.deepPurpleAccent,
         textTheme: GoogleFonts.workSansTextTheme(
           Theme.of(context).textTheme,
         ),
