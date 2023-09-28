@@ -37,67 +37,76 @@ class _TodoScreenState extends State<TodoScreen> {
         },
         // var dataTodo = [...dataTodox];
         // dataTodo.sort((a, b) => a['id'].compareTo(b['id']));
-        child: ListView.builder(
-          itemCount: dataTodo.length,
-          itemBuilder: (context, index) {
-            var todo = dataTodo[index];
-            bool status = todo['status'];
+        child: dataTodo.isNotEmpty
+            ? ListView.builder(
+                itemCount: dataTodo.length,
+                itemBuilder: (context, index) {
+                  var todo = dataTodo[index];
+                  bool status = todo['status'];
 
-            return Animate(
-              effects: const [FadeEffect(), ShakeEffect()],
-              autoPlay: true,
-              child: Card(
-                color: Colors.amber,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100.0),
-                ),
-                child: ListTile(
-                  leading: InkWell(
-                    onTap: () async {
-                      await supabaseClient.from('my_todo').update({'status': !status}).match({'id': todo['id']});
-                      doRefresh();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: status ? Colors.green : Colors.purple,
-                      child: Icon(
-                        status ? Icons.check : Icons.close,
-                        color: Colors.white,
+                  return Animate(
+                    effects: const [FadeEffect(), ShakeEffect()],
+                    autoPlay: true,
+                    child: Card(
+                      color: Colors.amber,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: ListTile(
+                        leading: InkWell(
+                          onTap: () async {
+                            await supabaseClient.from('my_todo').update({'status': !status}).match({'id': todo['id']});
+                            doRefresh();
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: status ? Colors.green : Colors.purple,
+                            child: Icon(
+                              status ? Icons.check : Icons.close,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        title: Text(todo['nama'], style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
+                        subtitle:
+                            Text(todo['id'].toString(), style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
+                        trailing: IconButton(
+                          onPressed: () async {
+                            final response = await supabaseClient.from('my_todo').delete().match({'id': todo['id']});
+                            if (response != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(response.status.toString()),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Data berhasil dihapus'),
+                                ),
+                              );
+                            }
+                            doRefresh();
+                          },
+                          icon: Animate(
+                            effects: const [ShakeEffect()],
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  title: Text(todo['nama'], style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
-                  subtitle: Text(todo['id'].toString(), style: TextStyle(decoration: status ? TextDecoration.lineThrough : TextDecoration.none)),
-                  trailing: IconButton(
-                    onPressed: () async {
-                      final response = await supabaseClient.from('my_todo').delete().match({'id': todo['id']});
-                      if (response != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(response.status.toString()),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Data berhasil dihapus'),
-                          ),
-                        );
-                      }
-                      doRefresh();
-                    },
-                    icon: Animate(
-                      effects: const [ShakeEffect()],
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
+                  );
+                },
+              )
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: const [
+                  Center(child: Text('Pull kebawah untuk menambah')),
+                  Icon(Icons.arrow_downward),
+                ],
               ),
-            );
-          },
-        ),
       ),
     );
   }
