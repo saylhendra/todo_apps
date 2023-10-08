@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  static const String routeName = 'profile-screen';
+class OrganismScreen extends StatelessWidget {
+  const OrganismScreen({super.key});
+  static const String routeName = 'organism-screen';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Organism'),
       ),
       body: const Center(
         child: Wrap(
           direction: Axis.vertical,
           children: [
             Text(
-              'Ini Profile Saya',
+              'Ini Organism Saya',
               style: TextStyle(fontSize: 24),
             ),
           ],

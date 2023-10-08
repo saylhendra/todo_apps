@@ -8,7 +8,7 @@ class TextBody1 extends StatelessWidget {
     this.text, {
     super.key,
     this.isBold = false,
-    this.color = AppColor.primary,
+    this.color = AppColor.white,
     this.fontSize,
   });
   final String text;
